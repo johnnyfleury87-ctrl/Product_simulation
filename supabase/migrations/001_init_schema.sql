@@ -225,5 +225,33 @@ CREATE INDEX idx_event_logs_type ON event_logs(type);
 CREATE INDEX idx_event_logs_created_at ON event_logs(created_at);
 
 -- ============================================================================
+-- ÉTAPE 1 AMÉLIORÉE: AUTHENTIFICATION & PROFILS
+-- ============================================================================
+
+-- Table profiles (lien vers auth.users de Supabase)
+CREATE TABLE profiles (
+  id UUID NOT NULL PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  email TEXT NOT NULL UNIQUE,
+  role TEXT NOT NULL CHECK (role IN ('admin', 'production', 'client', 'fournisseur', 'oncall')),
+  nom TEXT,
+  prenom TEXT,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Activation RLS sur profiles
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Chacun voit son profil
+CREATE POLICY "Users see own profile"
+  ON profiles FOR SELECT
+  USING (auth.uid() = id);
+
+-- Policy: Admin voit tous les profils
+CREATE POLICY "Admin sees all profiles"
+  ON profiles FOR SELECT
+  USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
+
+-- ============================================================================
 -- FIN DU SCHÉMA INITIAL
 -- ============================================================================
