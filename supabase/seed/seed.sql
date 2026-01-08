@@ -131,7 +131,7 @@ INSERT INTO lots (product_id, lot_code, dlc, status)
 SELECT 
   ps.id,
   'LOT-' || ps.product_code || '-' || TO_CHAR(NOW() + (i || ' days')::interval, 'YYYYMMDD') || '-' || LPAD(j::TEXT, 2, '0'),
-  (CURRENT_DATE + (ps.dlc_min_days + (j - 1) * (ps.dlc_max_days - ps.dlc_min_days) / 5)::INTEGER * INTERVAL '1 day'))::DATE,
+  CURRENT_DATE + (ps.dlc_min_days + (j - 1) * (ps.dlc_max_days - ps.dlc_min_days) / 5)::INTEGER,
   'STOCK'
 FROM product_stock ps
 CROSS JOIN GENERATE_SERIES(0, 4) AS i
