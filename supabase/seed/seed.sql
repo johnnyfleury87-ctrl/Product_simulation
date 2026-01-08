@@ -115,7 +115,7 @@ VALUES
   ('Aucamus', 'Quentin', '147 rue Clémentis, 75012 Paris', '10 88 99 00 11', 'quentin.aucamus@email.com', 'IMEI048'),
   ('Aucamus', 'Reine', '148 rue Clément, 75006 Paris', '10 99 00 11 22', 'reine.aucamus@email.com', 'IMEI049'),
   ('Aucamus', 'Stéphane', '149 rue Clément-Marot, 75008 Paris', '11 00 11 22 33', 'stephane.aucamus@email.com', 'IMEI050')
-ON CONFLICT DO NOTHING;
+ON CONFLICT (email) DO NOTHING;
 
 -- ============================================================================
 -- STOCK INITIAL (5 lots par produit avec DLC variées)
@@ -136,13 +136,16 @@ SELECT
 FROM product_stock ps
 CROSS JOIN GENERATE_SERIES(0, 4) AS i
 CROSS JOIN GENERATE_SERIES(1, 5) AS j
-ON CONFLICT DO NOTHING;
+ON CONFLICT (product_id, lot_code, dlc) DO NOTHING;
 
 -- Créer mouvements d'arrivage pour chaque lot
 INSERT INTO inventory_movements (lot_id, type, from_zone, to_zone, qty)
 SELECT l.id, 'INBOUND', NULL, 'ARRIVAGE', 100
 FROM lots l
-ON CONFLICT DO NOTHING;
+WHERE NOT EXISTS (
+  SELECT 1 FROM inventory_movements 
+  WHERE lot_id = l.id AND type = 'INBOUND'
+);
 
 -- Créer balances initiales en zone ARRIVAGE
 INSERT INTO inventory_balances (lot_id, zone, qty)
