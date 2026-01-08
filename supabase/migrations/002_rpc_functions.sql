@@ -321,13 +321,13 @@ $$ LANGUAGE plpgsql;
 -- INDICES POUR PERFORMANCES
 -- ============================================================================
 
-CREATE INDEX idx_lots_product_dlc ON lots(product_id, dlc);
-CREATE INDEX idx_lots_status ON lots(status);
-CREATE INDEX idx_allocations_order ON allocations(order_item_id);
-CREATE INDEX idx_allocations_lot ON allocations(lot_id);
-CREATE INDEX idx_recall_notifications_status ON recall_notifications(ack_status, escalation_status);
-CREATE INDEX idx_recall_notifications_customer ON recall_notifications(customer_id);
-CREATE INDEX idx_event_logs_type_date ON event_logs(type, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_lots_product_dlc ON lots(product_id, dlc);
+CREATE INDEX IF NOT EXISTS idx_lots_status ON lots(status);
+CREATE INDEX IF NOT EXISTS idx_allocations_order ON allocations(order_item_id);
+CREATE INDEX IF NOT EXISTS idx_allocations_lot ON allocations(lot_id);
+CREATE INDEX IF NOT EXISTS idx_recall_notifications_status ON recall_notifications(ack_status, escalation_status);
+CREATE INDEX IF NOT EXISTS idx_recall_notifications_customer ON recall_notifications(customer_id);
+CREATE INDEX IF NOT EXISTS idx_event_logs_type_date ON event_logs(type, created_at DESC);
 
 -- ============================================================================
 -- SÉCURITÉ - ROW LEVEL SECURITY (RLS)

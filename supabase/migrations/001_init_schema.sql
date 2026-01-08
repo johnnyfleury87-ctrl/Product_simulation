@@ -50,10 +50,10 @@ CREATE TABLE lots (
   updated_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE INDEX idx_lots_product_id ON lots(product_id);
-CREATE INDEX idx_lots_dlc ON lots(dlc);
-CREATE INDEX idx_lots_status ON lots(status);
-CREATE UNIQUE INDEX idx_lots_unique ON lots(product_id, lot_code, dlc);
+CREATE INDEX IF NOT EXISTS idx_lots_product_id ON lots(product_id);
+CREATE INDEX IF NOT EXISTS idx_lots_dlc ON lots(dlc);
+CREATE INDEX IF NOT EXISTS idx_lots_status ON lots(status);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_lots_unique ON lots(product_id, lot_code, dlc);
 
 CREATE TABLE inventory_movements (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -65,8 +65,8 @@ CREATE TABLE inventory_movements (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE INDEX idx_inventory_movements_lot_id ON inventory_movements(lot_id);
-CREATE INDEX idx_inventory_movements_type ON inventory_movements(type);
+CREATE INDEX IF NOT EXISTS idx_inventory_movements_lot_id ON inventory_movements(lot_id);
+CREATE INDEX IF NOT EXISTS idx_inventory_movements_type ON inventory_movements(type);
 
 CREATE TABLE inventory_balances (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -77,8 +77,8 @@ CREATE TABLE inventory_balances (
   updated_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE INDEX idx_inventory_balances_lot_id ON inventory_balances(lot_id);
-CREATE UNIQUE INDEX idx_inventory_balances_unique ON inventory_balances(lot_id, zone);
+CREATE INDEX IF NOT EXISTS idx_inventory_balances_lot_id ON inventory_balances(lot_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_inventory_balances_unique ON inventory_balances(lot_id, zone);
 
 -- ============================================================================
 -- ÉTAPE 4 : COMMANDES CLIENTS (simulation massive)
@@ -104,8 +104,8 @@ CREATE TABLE orders (
   updated_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE INDEX idx_orders_customer_id ON orders(customer_id);
-CREATE INDEX idx_orders_status ON orders(status);
+CREATE INDEX IF NOT EXISTS idx_orders_customer_id ON orders(customer_id);
+CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
 
 CREATE TABLE order_items (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -115,8 +115,8 @@ CREATE TABLE order_items (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE INDEX idx_order_items_order_id ON order_items(order_id);
-CREATE INDEX idx_order_items_product_id ON order_items(product_id);
+CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id);
+CREATE INDEX IF NOT EXISTS idx_order_items_product_id ON order_items(product_id);
 
 -- Allocation FEFO (First Expiry First Out)
 CREATE TABLE allocations (
@@ -129,9 +129,9 @@ CREATE TABLE allocations (
   updated_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE INDEX idx_allocations_order_item_id ON allocations(order_item_id);
-CREATE INDEX idx_allocations_lot_id ON allocations(lot_id);
-CREATE INDEX idx_allocations_status ON allocations(status);
+CREATE INDEX IF NOT EXISTS idx_allocations_order_item_id ON allocations(order_item_id);
+CREATE INDEX IF NOT EXISTS idx_allocations_lot_id ON allocations(lot_id);
+CREATE INDEX IF NOT EXISTS idx_allocations_status ON allocations(status);
 
 -- ============================================================================
 -- ÉTAPE 5 : SIMULATION ENGINE (400 commandes/jour)
@@ -157,8 +157,8 @@ CREATE TABLE sim_events (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE INDEX idx_sim_events_sim_run_id ON sim_events(sim_run_id);
-CREATE INDEX idx_sim_events_type ON sim_events(type);
+CREATE INDEX IF NOT EXISTS idx_sim_events_sim_run_id ON sim_events(sim_run_id);
+CREATE INDEX IF NOT EXISTS idx_sim_events_type ON sim_events(type);
 
 -- ============================================================================
 -- ÉTAPE 6 : RAPPEL PRODUIT (DLC ± 3 jours)
@@ -176,9 +176,9 @@ CREATE TABLE recalls (
   updated_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE INDEX idx_recalls_product_id ON recalls(product_id);
-CREATE INDEX idx_recalls_dlc_ref ON recalls(dlc_ref);
-CREATE INDEX idx_recalls_status ON recalls(status);
+CREATE INDEX IF NOT EXISTS idx_recalls_product_id ON recalls(product_id);
+CREATE INDEX IF NOT EXISTS idx_recalls_dlc_ref ON recalls(dlc_ref);
+CREATE INDEX IF NOT EXISTS idx_recalls_status ON recalls(status);
 
 CREATE TABLE recall_lots (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -187,9 +187,9 @@ CREATE TABLE recall_lots (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE INDEX idx_recall_lots_recall_id ON recall_lots(recall_id);
-CREATE INDEX idx_recall_lots_lot_id ON recall_lots(lot_id);
-CREATE UNIQUE INDEX idx_recall_lots_unique ON recall_lots(recall_id, lot_id);
+CREATE INDEX IF NOT EXISTS idx_recall_lots_recall_id ON recall_lots(recall_id);
+CREATE INDEX IF NOT EXISTS idx_recall_lots_lot_id ON recall_lots(lot_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_recall_lots_unique ON recall_lots(recall_id, lot_id);
 
 -- ============================================================================
 -- ÉTAPE 7 : NOTIFICATIONS & ESCALADE
@@ -209,10 +209,10 @@ CREATE TABLE recall_notifications (
   updated_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE INDEX idx_recall_notifications_recall_id ON recall_notifications(recall_id);
-CREATE INDEX idx_recall_notifications_customer_id ON recall_notifications(customer_id);
-CREATE INDEX idx_recall_notifications_ack_status ON recall_notifications(ack_status);
-CREATE INDEX idx_recall_notifications_escalation_status ON recall_notifications(escalation_status);
+CREATE INDEX IF NOT EXISTS idx_recall_notifications_recall_id ON recall_notifications(recall_id);
+CREATE INDEX IF NOT EXISTS idx_recall_notifications_customer_id ON recall_notifications(customer_id);
+CREATE INDEX IF NOT EXISTS idx_recall_notifications_ack_status ON recall_notifications(ack_status);
+CREATE INDEX IF NOT EXISTS idx_recall_notifications_escalation_status ON recall_notifications(escalation_status);
 
 CREATE TABLE event_logs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -221,8 +221,8 @@ CREATE TABLE event_logs (
   created_at TIMESTAMP DEFAULT NOW()
 );
 
-CREATE INDEX idx_event_logs_type ON event_logs(type);
-CREATE INDEX idx_event_logs_created_at ON event_logs(created_at);
+CREATE INDEX IF NOT EXISTS idx_event_logs_type ON event_logs(type);
+CREATE INDEX IF NOT EXISTS idx_event_logs_created_at ON event_logs(created_at);
 
 -- ============================================================================
 -- ÉTAPE 1 AMÉLIORÉE: AUTHENTIFICATION & PROFILS
