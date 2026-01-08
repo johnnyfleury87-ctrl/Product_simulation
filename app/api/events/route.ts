@@ -1,4 +1,4 @@
-import { supabaseServer } from '@/lib/supabaseServer';
+import { getSupabaseServer } from '@/lib/supabaseServer';
 import { NextRequest, NextResponse } from 'next/server';
 
 /**
@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 export async function GET(request: NextRequest) {
   try {
+    const supabaseServer = getSupabaseServer();
     const type = request.nextUrl.searchParams.get('type');
     const limit = parseInt(request.nextUrl.searchParams.get('limit') || '100');
     const days = parseInt(request.nextUrl.searchParams.get('days') || '7');

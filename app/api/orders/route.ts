@@ -1,4 +1,4 @@
-import { supabaseServer } from '@/lib/supabaseServer';
+import { getSupabaseServer } from '@/lib/supabaseServer';
 import { CreateOrderRequest } from '@/lib/types';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
   try {
     const body: CreateOrderRequest = await request.json();
     const { customer_id, items } = body;
+    const supabaseServer = getSupabaseServer();
 
     // Valider les champs
     if (!customer_id || !items || items.length === 0) {
@@ -95,6 +96,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const customerId = request.nextUrl.searchParams.get('customer_id');
+    const supabaseServer = getSupabaseServer();
 
     if (!customerId) {
       return NextResponse.json(

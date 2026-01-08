@@ -1,4 +1,4 @@
-import { supabaseServer } from '@/lib/supabaseServer';
+import { getSupabaseServer } from '@/lib/supabaseServer';
 import { CreateRecallRequest, AckRecallRequest } from '@/lib/types';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 export async function POST(request: NextRequest) {
   try {
+    const supabaseServer = getSupabaseServer();
     const body: CreateRecallRequest = await request.json();
     const { product_id, dlc_ref, severity } = body;
 
@@ -58,6 +59,7 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
+    const supabaseServer = getSupabaseServer();
     const customerId = request.nextUrl.searchParams.get('customer_id');
 
     if (!customerId) {

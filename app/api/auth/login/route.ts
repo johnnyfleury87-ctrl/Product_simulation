@@ -1,9 +1,10 @@
-import { supabaseServer } from '@/lib/supabaseServer';
+import { getSupabaseServer } from '@/lib/supabaseServer';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
+    const supabaseServer = getSupabaseServer();
 
     // Vérifier les champs
     if (!email || !password) {

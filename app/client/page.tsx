@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 export default function ClientPage() {
   const [user, setUser] = useState<any>(null);
-  const [recalls, setRecalls] = useState([]);
+  const [recalls, setRecalls] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 

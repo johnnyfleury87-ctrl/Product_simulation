@@ -1,4 +1,4 @@
-import { supabaseServer } from '@/lib/supabaseServer';
+import { getSupabaseServer } from '@/lib/supabaseServer';
 import { AckRecallRequest } from '@/lib/types';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 export async function POST(request: NextRequest) {
   try {
+    const supabaseServer = getSupabaseServer();
     const body: AckRecallRequest = await request.json();
     const { notification_id } = body;
 

@@ -1,4 +1,4 @@
-import { supabaseServer } from '@/lib/supabaseServer';
+import { getSupabaseServer } from '@/lib/supabaseServer';
 import { ScanRequest } from '@/lib/types';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
   try {
     const body: ScanRequest = await request.json();
     const { product_code, lot_code, dlc, qty } = body;
+    const supabaseServer = getSupabaseServer();
 
     // Valider les champs
     if (!product_code || !lot_code || !dlc || !qty) {
