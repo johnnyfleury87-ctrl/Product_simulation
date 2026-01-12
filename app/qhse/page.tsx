@@ -14,6 +14,11 @@ import {
   groupImpactsByCenter,
   RecallImpact,
 } from "@/lib/simulateRecall";
+import {
+  useRealtimeSimulation,
+  calculateLiveStats,
+  getImpactsByCenter,
+} from "@/lib/useRealtimeSimulation";
 import { DEMO_PRODUCTS, DISTRIBUTION_CENTERS, DEMO_CUSTOMERS } from "@/data/demoCatalog";
 import styles from "./page.module.css";
 
@@ -25,6 +30,22 @@ export default function QHSERecallSimulator() {
   const [selectedSeverity, setSelectedSeverity] = useState<Severity>("MEDIUM");
   const [filterUnconfirmedOnly, setFilterUnconfirmedOnly] = useState(false);
   const [sortBy, setSortBy] = useState<"center" | "status" | "name">("center");
+
+  // État de simulation temps réel
+  const [realtimeEnabled, setRealtimeEnabled] = useState(false);
+  const [realtimePaused, setRealtimePaused] = useState(false);
+
+  // Hook de simulation temps réel
+  useRealtimeSimulation(
+    recall,
+    {
+      enabled: realtimeEnabled && !realtimePaused,
+      intervalMs: 2000,
+      confirmationProbability: 0.3,
+      worstCaseProbability: 0.1,
+    },
+    setRecall,
+  );
 
   // Lancer une simulation
   const launchRecall = () => {
@@ -38,6 +59,8 @@ export default function QHSERecallSimulator() {
       selectedSeverity,
     );
     setRecall(newRecall);
+    setRealtimeEnabled(true);
+    setRealtimePaused(false);
   };
 
   // Actions QHSE
@@ -54,21 +77,50 @@ export default function QHSERecallSimulator() {
   };
 
   const handleConfirmCustomer = (customerId: string) => {
-    if (recall) setRecall(confirmCustomer(recall, customerId));
+    if (recall) {
+      const updated = { ...recall };
+      updated.impacts = recall.impacts.map((i) =>
+        i.customer_id === customerId
+          ? {
+              ...i,
+              client_confirmed: true,
+              confirmed_status: "confirmed" as const,
+              timestamp_confirmed: new Date().toISOString(),
+            }
+          : i,
+      );
+      setRecall(updated);
+    }
   };
 
   const handleConfirmAll = () => {
-    if (recall) setRecall(confirmAllCustomers(recall));
+    if (recall) {
+      const updated = { ...recall };
+      updated.impacts = recall.impacts.map((i) => ({
+        ...i,
+        client_confirmed: true,
+        confirmed_status: "confirmed" as const,
+        timestamp_confirmed: new Date().toISOString(),
+      }));
+      setRecall(updated);
+    }
   };
 
-  // Traitement des données
+  const handleResetSimulation = () => {
+    setRecall(null);
+    setRealtimeEnabled(false);
+    setRealtimePaused(false);
+  };
+
+  // Calculs en temps réel
+  const liveStats = calculateLiveStats(recall);
+  const impactsByCenter = getImpactsByCenter(recall);
   const stats = recall ? getRecallStats(recall) : null;
-  const impactsByCenter = recall ? groupImpactsByCenter(recall) : {};
 
   // Filtrer et trier les impacts
   let filteredImpacts = recall?.impacts || [];
   if (filterUnconfirmedOnly) {
-    filteredImpacts = filteredImpacts.filter((i) => !i.client_confirmed);
+    filteredImpacts = filteredImpacts.filter((i) => i.confirmed_status === "pending");
   }
 
   filteredImpacts = filteredImpacts.sort((a, b) => {
@@ -84,8 +136,10 @@ export default function QHSERecallSimulator() {
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <h1 className={styles.headerTitle}>🚨 QHSE Recall Simulator</h1>
-        <p className={styles.headerSubtitle}>Simulation de rappel de produits - Mode DÉMO</p>
+        <h1 className={styles.headerTitle}>🚨 QHSE Recall Simulator - Suisse</h1>
+        <p className={styles.headerSubtitle}>
+          Simulation de rappel de produits - Mode DÉMO - Contexte Suisse
+        </p>
       </header>
 
       <div className={styles.mainLayout}>
@@ -134,12 +188,23 @@ export default function QHSERecallSimulator() {
               </div>
             </div>
 
-            <button
-              className={styles.launchBtn}
-              onClick={launchRecall}
-            >
+            <button className={styles.launchBtn} onClick={launchRecall}>
               ▶ Lancer la simulation
             </button>
+
+            {recall && (
+              <div className={styles.simControls}>
+                <button
+                  className={`${styles.controlBtn} ${realtimePaused ? styles.paused : ""}`}
+                  onClick={() => setRealtimePaused(!realtimePaused)}
+                >
+                  {realtimePaused ? "▶ Reprendre" : "⏸ Pause"}
+                </button>
+                <button className={`${styles.controlBtn} ${styles.reset}`} onClick={handleResetSimulation}>
+                  🔄 Réinitialiser
+                </button>
+              </div>
+            )}
           </div>
         </aside>
 
@@ -147,23 +212,27 @@ export default function QHSERecallSimulator() {
         <main className={styles.rightPanel}>
           {recall && stats ? (
             <>
-              {/* KPIs */}
+              {/* KPIs EN TEMPS RÉEL */}
               <div className={styles.kpisGrid}>
                 <div className={`${styles.kpiCard} ${styles.primary}`}>
                   <div className={styles.kpiValue}>{stats.totalAffectedUnits.toLocaleString()}</div>
                   <div className={styles.kpiLabel}>Unités concernées</div>
                 </div>
                 <div className={`${styles.kpiCard} ${styles.secondary}`}>
-                  <div className={styles.kpiValue}>{stats.totalAffectedCustomers}</div>
+                  <div className={styles.kpiValue}>{liveStats.total}</div>
                   <div className={styles.kpiLabel}>Clients impactés</div>
                 </div>
-                <div className={`${styles.kpiCard} ${stats.centralNotified ? styles.success : styles.warning}`}>
-                  <div className={styles.kpiValue}>{stats.centralNotified ? "✅" : "❌"}</div>
-                  <div className={styles.kpiLabel}>Centrales averties</div>
+                <div className={`${styles.kpiCard} ${styles.success}`}>
+                  <div className={styles.kpiValue}>{liveStats.confirmed}</div>
+                  <div className={styles.kpiLabel}>✅ Confirmés</div>
                 </div>
-                <div className={`${styles.kpiCard} ${stats.transportStopped ? styles.success : styles.warning}`}>
-                  <div className={styles.kpiValue}>{stats.transportStopped ? "✅" : "❌"}</div>
-                  <div className={styles.kpiLabel}>Transport stoppé</div>
+                <div className={`${styles.kpiCard} ${styles.warning}`}>
+                  <div className={styles.kpiValue}>{liveStats.pending}</div>
+                  <div className={styles.kpiLabel}>⏳ En attente</div>
+                </div>
+                <div className={`${styles.kpiCard} ${styles.info}`}>
+                  <div className={styles.kpiValue}>{liveStats.confirmationRate}%</div>
+                  <div className={styles.kpiLabel}>Taux confirmation</div>
                 </div>
               </div>
 
@@ -173,38 +242,69 @@ export default function QHSERecallSimulator() {
                 <div className={styles.locationGrid}>
                   <div className={styles.locationItem}>
                     <span className={styles.locationItemLabel}>📦 En stock</span>
-                    <strong className={styles.locationItemValue}>{recall.distribution_by_location.stock.toLocaleString()}</strong>
-                    <small className={styles.locationItemPercent}>{((recall.distribution_by_location.stock / stats.totalAffectedUnits) * 100).toFixed(1)}%</small>
+                    <strong className={styles.locationItemValue}>
+                      {recall.distribution_by_location.stock.toLocaleString()}
+                    </strong>
+                    <small className={styles.locationItemPercent}>
+                      {((recall.distribution_by_location.stock / stats.totalAffectedUnits) * 100).toFixed(1)}%
+                    </small>
                   </div>
                   <div className={styles.locationItem}>
                     <span className={styles.locationItemLabel}>📋 En préparation</span>
-                    <strong className={styles.locationItemValue}>{recall.distribution_by_location.preparation.toLocaleString()}</strong>
-                    <small className={styles.locationItemPercent}>{((recall.distribution_by_location.preparation / stats.totalAffectedUnits) * 100).toFixed(1)}%</small>
+                    <strong className={styles.locationItemValue}>
+                      {recall.distribution_by_location.preparation.toLocaleString()}
+                    </strong>
+                    <small className={styles.locationItemPercent}>
+                      {((recall.distribution_by_location.preparation / stats.totalAffectedUnits) * 100).toFixed(1)}%
+                    </small>
                   </div>
                   <div className={styles.locationItem}>
                     <span className={styles.locationItemLabel}>🚚 En transit</span>
-                    <strong className={styles.locationItemValue}>{recall.distribution_by_location.in_transit.toLocaleString()}</strong>
-                    <small className={styles.locationItemPercent}>{((recall.distribution_by_location.in_transit / stats.totalAffectedUnits) * 100).toFixed(1)}%</small>
+                    <strong className={styles.locationItemValue}>
+                      {recall.distribution_by_location.in_transit.toLocaleString()}
+                    </strong>
+                    <small className={styles.locationItemPercent}>
+                      {((recall.distribution_by_location.in_transit / stats.totalAffectedUnits) * 100).toFixed(1)}%
+                    </small>
                   </div>
                   <div className={styles.locationItem}>
                     <span className={styles.locationItemLabel}>📨 Livré au client</span>
-                    <strong className={styles.locationItemValue}>{recall.distribution_by_location.delivered.toLocaleString()}</strong>
-                    <small className={styles.locationItemPercent}>{((recall.distribution_by_location.delivered / stats.totalAffectedUnits) * 100).toFixed(1)}%</small>
+                    <strong className={styles.locationItemValue}>
+                      {recall.distribution_by_location.delivered.toLocaleString()}
+                    </strong>
+                    <small className={styles.locationItemPercent}>
+                      {((recall.distribution_by_location.delivered / stats.totalAffectedUnits) * 100).toFixed(1)}%
+                    </small>
                   </div>
                 </div>
               </div>
 
-              {/* Répartition par centre */}
+              {/* Répartition par centre - CONTEXTE SUISSE */}
               <div className={styles.card}>
-                <h3 className={styles.cardSubtitle}>Répartition par centre</h3>
+                <h3 className={styles.cardSubtitle}>Répartition par centre (Suisse)</h3>
                 <div className={styles.centerGrid}>
                   {DISTRIBUTION_CENTERS.map((dc) => {
                     const qty = recall.distribution_by_center[dc.id] || 0;
+                    const centerStats = impactsByCenter[dc.id] || { confirmed: 0, pending: 0, total: 0 };
+
                     return (
                       <div key={dc.id} className={styles.centerItem}>
-                        <strong className={styles.centerItemName}>{dc.name}</strong>
-                        <div className={styles.centerItemValue}>{qty.toLocaleString()} unités</div>
-                        <small className={styles.centerItemCity}>{dc.city} ({dc.region})</small>
+                        <div className={styles.centerItemHeader}>
+                          <strong className={styles.centerItemName}>
+                            {dc.code} - {dc.name}
+                          </strong>
+                          <span className={styles.centerItemBadge}>{dc.city}</span>
+                        </div>
+                        <div className={styles.centerItemAddress}>
+                          {dc.address}, {dc.postalCode} {dc.city}
+                        </div>
+                        <div className={styles.centerItemPhone}>📞 {dc.phone}</div>
+                        <div className={styles.centerItemStats}>
+                          <div className={styles.centerItemValue}>{qty.toLocaleString()} unités</div>
+                          <div className={styles.centerItemConfirmation}>
+                            ✅ {centerStats.confirmed} / ⏳ {centerStats.pending}
+                          </div>
+                        </div>
                       </div>
                     );
                   })}
@@ -239,29 +339,35 @@ export default function QHSERecallSimulator() {
                       : "📧 Envoyer SMS + Email"}
                   </button>
                   <button
-                    className={`${styles.actionBtn} ${stats.confirmedCustomers === stats.totalAffectedCustomers ? styles.disabled : ""}`}
+                    className={`${styles.actionBtn} ${liveStats.pending === 0 ? styles.disabled : ""}`}
                     onClick={handleConfirmAll}
-                    disabled={stats.confirmedCustomers === stats.totalAffectedCustomers}
+                    disabled={liveStats.pending === 0}
                   >
-                    Confirmer tous ({stats.confirmedCustomers}/{stats.totalAffectedCustomers})
+                    Confirmer tous ({liveStats.confirmed}/{liveStats.total})
                   </button>
                 </div>
               </div>
 
-              {/* Stats confirmations */}
+              {/* Stats confirmations en temps réel */}
               <div className={styles.card}>
-                <h3 className={styles.cardSubtitle}>État des confirmations</h3>
+                <h3 className={styles.cardSubtitle}>État des confirmations (TEMPS RÉEL)</h3>
                 <div className={styles.statsRow}>
                   <div className={styles.statsRowItem}>
-                    <strong style={{ color: "#10b981" }}>✅ Confirmés:</strong> {stats.confirmedCustomers} clients
+                    <strong style={{ color: "#10b981" }}>✅ Confirmés:</strong> {liveStats.confirmed} clients
                   </div>
                   <div className={styles.statsRowItem}>
-                    <strong style={{ color: "#f59e0b" }}>⏳ En attente:</strong> {stats.pendingCustomers} clients
+                    <strong style={{ color: "#f59e0b" }}>⏳ En attente:</strong> {liveStats.pending} clients
                   </div>
                   <div className={styles.statsRowItem}>
-                    <strong>📊 Taux:</strong> {((stats.confirmedCustomers / stats.totalAffectedCustomers) * 100).toFixed(0)}%
+                    <strong>📊 Taux:</strong> {liveStats.confirmationRate}%
                   </div>
                 </div>
+                {realtimeEnabled && (
+                  <div className={styles.realtimeIndicator}>
+                    <span className={styles.realtimePulse}></span>
+                    {realtimePaused ? "⏸ Simulation PAUSÉE" : "🔴 Simulation EN COURS"}
+                  </div>
+                )}
               </div>
             </>
           ) : (
@@ -276,7 +382,9 @@ export default function QHSERecallSimulator() {
       {recall && (
         <div className={styles.clientsSection}>
           <div className={styles.clientsHeader}>
-            <h2 className={styles.clientsHeaderTitle}>Clients impactés ({filteredImpacts.length})</h2>
+            <h2 className={styles.clientsHeaderTitle}>
+              Clients impactés ({filteredImpacts.length})
+            </h2>
             <div className={styles.controls}>
               <label className={styles.controlsLabel}>
                 <input
@@ -286,7 +394,11 @@ export default function QHSERecallSimulator() {
                 />
                 Non confirmés uniquement
               </label>
-              <select value={sortBy} onChange={(e) => setSortBy(e.target.value as any)} className={styles.controlsSelect}>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className={styles.controlsSelect}
+              >
                 <option value="center">Trier par centre</option>
                 <option value="status">Trier par localisation</option>
                 <option value="name">Trier par client</option>
@@ -311,18 +423,21 @@ export default function QHSERecallSimulator() {
               </thead>
               <tbody>
                 {filteredImpacts.map((impact) => {
-                  const impact_record = recall.impacts.find((i) => i.customer_id === impact.customer_id);
                   const customer = DEMO_CUSTOMERS.find((c) => c.id === impact.customer_id);
-                  const center = DISTRIBUTION_CENTERS.find((c) => c.id === impact.distribution_center_id);
+                  const center = DISTRIBUTION_CENTERS.find(
+                    (c) => c.id === impact.distribution_center_id,
+                  );
 
                   if (!customer || !center) return null;
 
                   const notificationStatus = `${impact.sms_sent ? "✅ SMS" : "❌ SMS"} | ${impact.email_sent ? "✅ Email" : "❌ Email"}`;
+                  const isPending = impact.confirmed_status === "pending";
+                  const isHighRisk = impact.location === "delivered";
 
                   return (
                     <tr
                       key={impact.customer_id}
-                      className={`${!impact.client_confirmed ? styles.clientsTableRow + " " + styles.unconfirmed : styles.clientsTableRow + " " + styles.confirmed} ${impact.location === "delivered" ? styles.highRisk : ""}`}
+                      className={`${styles.clientsTableRow} ${isPending ? styles.rowPending : styles.rowConfirmed} ${isHighRisk ? styles.rowHighRisk : ""}`}
                     >
                       <td className={styles.clientsTableCell}>
                         <strong className={styles.clientsTableCellStrong}>
@@ -331,7 +446,9 @@ export default function QHSERecallSimulator() {
                       </td>
                       <td className={styles.clientsTableCell}>{customer.email}</td>
                       <td className={styles.clientsTableCell}>{customer.telephone}</td>
-                      <td className={styles.clientsTableCell}>{center.name}</td>
+                      <td className={styles.clientsTableCell}>
+                        <strong>{center.code}</strong> {center.city}
+                      </td>
                       <td className={styles.clientsTableCell}>
                         <span className={styles.badge}>
                           {impact.location === "stock" && "📦 Stock"}
@@ -343,12 +460,20 @@ export default function QHSERecallSimulator() {
                       <td className={styles.clientsTableCell}>{impact.qty_units}</td>
                       <td className={styles.clientsTableCell}>{notificationStatus}</td>
                       <td className={styles.clientsTableCell}>
-                        <span className={`${styles.statusBadge} ${impact.client_confirmed ? styles.confirmed : styles.pending}`}>
-                          {impact.client_confirmed ? "✅ Confirmé" : "⏳ En attente"}
+                        <span
+                          className={`${styles.statusBadge} ${isPending ? styles.badgePending : styles.badgeConfirmed}`}
+                        >
+                          {isPending ? (
+                            <>
+                              <span className={styles.blinkAnimation}>●</span> EN ATTENTE
+                            </>
+                          ) : (
+                            "✅ CONFIRMÉ"
+                          )}
                         </span>
                       </td>
                       <td className={styles.clientsTableCell}>
-                        {!impact.client_confirmed && (
+                        {isPending && (
                           <button
                             className={styles.confirmBtn}
                             onClick={() => handleConfirmCustomer(impact.customer_id)}

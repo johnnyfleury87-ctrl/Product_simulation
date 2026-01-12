@@ -19,6 +19,7 @@ export interface RecallImpact {
   sms_sent: boolean;
   email_sent: boolean;
   client_confirmed: boolean;
+  confirmed_status: "pending" | "confirmed";
   timestamp_created: string;
   timestamp_notification: string | null;
   timestamp_confirmed: string | null;
@@ -193,6 +194,7 @@ function generateImpacts(
       sms_sent: false,
       email_sent: false,
       client_confirmed: false,
+      confirmed_status: "pending",
       timestamp_created: now,
       timestamp_notification: null,
       timestamp_confirmed: null,
