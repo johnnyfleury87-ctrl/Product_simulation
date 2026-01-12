@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import MainNavigation from './components/MainNavigation';
 
 export const metadata: Metadata = {
   title: 'Simulation Traçabilité Produits & DLC',
@@ -14,6 +15,9 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body style={{ fontFamily: 'system-ui, sans-serif', margin: 0, padding: 0 }}>
+        {/* Navigation globale - visible sur toutes les pages */}
+        <MainNavigation />
+        
         <div style={{ minHeight: '100vh', backgroundColor: '#f5f5f5' }}>
           {children}
         </div>

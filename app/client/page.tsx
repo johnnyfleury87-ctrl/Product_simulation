@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import PageHeader from '@/app/components/PageHeader';
 
 export default function ClientPage() {
   const [user, setUser] = useState<any>(null);
@@ -42,13 +43,11 @@ export default function ClientPage() {
 
   return (
     <div style={styles.container}>
-      <header style={styles.header}>
-        <h1>Vue Client</h1>
-        <button onClick={() => {
-          localStorage.clear();
-          router.push('/login');
-        }} style={styles.btn}>Déconnexion</button>
-      </header>
+      <PageHeader 
+        title="Client - Rappels de Produits"
+        subtitle="Consultez les rappels vous concernant"
+        icon="🧾"
+      />
 
       <main style={styles.main}>
         <h2>Rappels actifs ({recalls.length})</h2>

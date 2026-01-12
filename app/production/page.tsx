@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Profile } from '@/lib/types';
+import PageHeader from '@/app/components/PageHeader';
 
 export default function ProductionPage() {
   const [user, setUser] = useState<Profile | null>(null);
@@ -65,13 +66,11 @@ export default function ProductionPage() {
 
   return (
     <div style={styles.container}>
-      <header style={styles.header}>
-        <h1>Vue Production - Réception & Stock</h1>
-        <button onClick={() => {
-          localStorage.clear();
-          router.push('/login');
-        }} style={styles.btn}>Déconnexion</button>
-      </header>
+      <PageHeader 
+        title="Production - Réception & Stock"
+        subtitle="Gestion des arrivages et mouvements de stock"
+        icon="🏭"
+      />
 
       <main style={styles.main}>
         <div style={styles.card}>

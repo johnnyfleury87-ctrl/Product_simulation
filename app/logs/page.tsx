@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import PageHeader from '@/app/components/PageHeader';
 
 export default function LogsPage() {
   const [user, setUser] = useState<any>(null);
@@ -40,13 +41,11 @@ export default function LogsPage() {
 
   return (
     <div style={styles.container}>
-      <header style={styles.header}>
-        <h1>Vue Logs - Journal d'événements</h1>
-        <button onClick={() => {
-          localStorage.clear();
-          router.push('/login');
-        }} style={styles.btn}>Déconnexion</button>
-      </header>
+      <PageHeader 
+        title="Logs - Historique des Événements"
+        subtitle="Consultez tous les événements du système"
+        icon="📜"
+      />
 
       <main style={styles.main}>
         <div style={styles.filter}>

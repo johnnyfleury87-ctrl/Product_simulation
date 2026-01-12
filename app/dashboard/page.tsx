@@ -57,14 +57,8 @@ export default function DashboardPage() {
   return (
     <div style={styles.container}>
       <header style={styles.header}>
-        <h1>Control Tower - Dashboard Admin</h1>
-        <div>
-          <span>{user.email}</span>
-          <button onClick={() => {
-            localStorage.clear();
-            router.push('/login');
-          }} style={styles.logoutBtn}>Déconnexion</button>
-        </div>
+        <h1>📊 Control Tower - Dashboard Admin</h1>
+        <p style={styles.subtitle}>Vue d'ensemble de la simulation</p>
       </header>
 
       <main style={styles.main}>

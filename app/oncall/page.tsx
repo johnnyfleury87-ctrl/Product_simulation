@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import PageHeader from '@/app/components/PageHeader';
 
 export default function OncallPage() {
   const [user, setUser] = useState<any>(null);
@@ -26,13 +27,11 @@ export default function OncallPage() {
 
   return (
     <div style={styles.container}>
-      <header style={styles.header}>
-        <h1>Vue On-call - Gestion escalades</h1>
-        <button onClick={() => {
-          localStorage.clear();
-          router.push('/login');
-        }} style={styles.btn}>Déconnexion</button>
-      </header>
+      <PageHeader 
+        title="On-call - Gestion des Escalades"
+        subtitle="Gérez les escalades de rappels"
+        icon="🚨"
+      />
 
       <main style={styles.main}>
         <h2>Escalades actives ({escalations.length})</h2>

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import PageHeader from '@/app/components/PageHeader';
 
 export default function FournisseurPage() {
   const [user, setUser] = useState<any>(null);
@@ -51,13 +52,11 @@ export default function FournisseurPage() {
 
   return (
     <div style={styles.container}>
-      <header style={styles.header}>
-        <h1>Vue Fournisseur</h1>
-        <button onClick={() => {
-          localStorage.clear();
-          router.push('/login');
-        }} style={styles.btn}>Déconnexion</button>
-      </header>
+      <PageHeader 
+        title="Fournisseur - Gestion des Rappels"
+        subtitle="Créer et gérer les rappels produits"
+        icon="📦"
+      />
 
       <main style={styles.main}>
         <div style={styles.card}>
