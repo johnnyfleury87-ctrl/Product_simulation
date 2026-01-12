@@ -51,16 +51,34 @@ CREATE POLICY "Anyone can view active products"
   ON products FOR SELECT
   USING (active = TRUE);
 
-CREATE POLICY "Admin can manage products"
-  ON products FOR ALL
+CREATE POLICY "Admin can insert products"
+  ON products FOR INSERT
+  WITH CHECK ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
+
+CREATE POLICY "Admin can update products"
+  ON products FOR UPDATE
+  USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin')
+  WITH CHECK ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
+
+CREATE POLICY "Admin can delete products"
+  ON products FOR DELETE
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
 
 CREATE POLICY "Anyone can view product ranges"
   ON product_ranges FOR SELECT
   USING (TRUE);
 
-CREATE POLICY "Admin can manage product ranges"
-  ON product_ranges FOR ALL
+CREATE POLICY "Admin can insert product ranges"
+  ON product_ranges FOR INSERT
+  WITH CHECK ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
+
+CREATE POLICY "Admin can update product ranges"
+  ON product_ranges FOR UPDATE
+  USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin')
+  WITH CHECK ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
+
+CREATE POLICY "Admin can delete product ranges"
+  ON product_ranges FOR DELETE
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
 
 -- ============================================================================
@@ -71,12 +89,17 @@ CREATE POLICY "Production can view all lots"
   ON lots FOR SELECT
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) IN ('production', 'admin'));
 
-CREATE POLICY "Production can create/update lots"
+CREATE POLICY "Production can create lots"
   ON lots FOR INSERT
   WITH CHECK ((SELECT role FROM profiles WHERE id = auth.uid()) IN ('production', 'admin'));
 
 CREATE POLICY "Production can update lot status"
   ON lots FOR UPDATE
+  USING ((SELECT role FROM profiles WHERE id = auth.uid()) IN ('production', 'admin'))
+  WITH CHECK ((SELECT role FROM profiles WHERE id = auth.uid()) IN ('production', 'admin'));
+
+CREATE POLICY "Production can delete lots"
+  ON lots FOR DELETE
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) IN ('production', 'admin'));
 
 CREATE POLICY "Clients can see only their allocated lots (via orders)"
@@ -103,8 +126,17 @@ CREATE POLICY "Customers see only their own profile"
     OR (SELECT role FROM profiles WHERE id = auth.uid()) IN ('admin', 'production')
   );
 
-CREATE POLICY "Admin can manage all customers"
-  ON customers FOR ALL
+CREATE POLICY "Admin can insert customers"
+  ON customers FOR INSERT
+  WITH CHECK ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
+
+CREATE POLICY "Admin can update customers"
+  ON customers FOR UPDATE
+  USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin')
+  WITH CHECK ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
+
+CREATE POLICY "Admin can delete customers"
+  ON customers FOR DELETE
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
 
 -- ============================================================================
@@ -124,8 +156,17 @@ CREATE POLICY "Admin and production can view all orders"
   ON orders FOR SELECT
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) IN ('admin', 'production'));
 
-CREATE POLICY "Admin can create/update orders"
-  ON orders FOR ALL
+CREATE POLICY "Admin can insert orders"
+  ON orders FOR INSERT
+  WITH CHECK ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
+
+CREATE POLICY "Admin can update orders"
+  ON orders FOR UPDATE
+  USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin')
+  WITH CHECK ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
+
+CREATE POLICY "Admin can delete orders"
+  ON orders FOR DELETE
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
 
 CREATE POLICY "Customers see items in their orders"
@@ -147,8 +188,17 @@ CREATE POLICY "Production and admin view allocations"
   ON allocations FOR SELECT
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) IN ('admin', 'production'));
 
-CREATE POLICY "Admin can manage allocations"
-  ON allocations FOR ALL
+CREATE POLICY "Admin can insert allocations"
+  ON allocations FOR INSERT
+  WITH CHECK ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
+
+CREATE POLICY "Admin can update allocations"
+  ON allocations FOR UPDATE
+  USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin')
+  WITH CHECK ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
+
+CREATE POLICY "Admin can delete allocations"
+  ON allocations FOR DELETE
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
 
 -- ============================================================================
@@ -159,8 +209,17 @@ CREATE POLICY "Admin and production view all recalls"
   ON recalls FOR SELECT
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) IN ('admin', 'production'));
 
-CREATE POLICY "Admin can manage recalls"
-  ON recalls FOR ALL
+CREATE POLICY "Admin can insert recalls"
+  ON recalls FOR INSERT
+  WITH CHECK ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
+
+CREATE POLICY "Admin can update recalls"
+  ON recalls FOR UPDATE
+  USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin')
+  WITH CHECK ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
+
+CREATE POLICY "Admin can delete recalls"
+  ON recalls FOR DELETE
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
 
 CREATE POLICY "Fournisseur views recalls"
@@ -175,8 +234,17 @@ CREATE POLICY "Admin and production view recall lots"
   ON recall_lots FOR SELECT
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) IN ('admin', 'production'));
 
-CREATE POLICY "Admin manages recall lots"
-  ON recall_lots FOR ALL
+CREATE POLICY "Admin can insert recall lots"
+  ON recall_lots FOR INSERT
+  WITH CHECK ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
+
+CREATE POLICY "Admin can update recall lots"
+  ON recall_lots FOR UPDATE
+  USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin')
+  WITH CHECK ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
+
+CREATE POLICY "Admin can delete recall lots"
+  ON recall_lots FOR DELETE
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) = 'admin');
 
 -- ============================================================================
@@ -226,8 +294,17 @@ CREATE POLICY "Production and admin view inventory balances"
   ON inventory_balances FOR SELECT
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) IN ('admin', 'production'));
 
-CREATE POLICY "Production and admin manage inventory balances"
-  ON inventory_balances FOR ALL
+CREATE POLICY "Production and admin insert inventory balances"
+  ON inventory_balances FOR INSERT
+  WITH CHECK ((SELECT role FROM profiles WHERE id = auth.uid()) IN ('admin', 'production'));
+
+CREATE POLICY "Production and admin update inventory balances"
+  ON inventory_balances FOR UPDATE
+  USING ((SELECT role FROM profiles WHERE id = auth.uid()) IN ('admin', 'production'))
+  WITH CHECK ((SELECT role FROM profiles WHERE id = auth.uid()) IN ('admin', 'production'));
+
+CREATE POLICY "Production and admin delete inventory balances"
+  ON inventory_balances FOR DELETE
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) IN ('admin', 'production'));
 
 -- ============================================================================
@@ -246,13 +323,30 @@ CREATE POLICY "Anyone can insert events (via RPC)"
 -- SIM_RUNS & SIM_EVENTS (admin/production)
 -- ============================================================================
 
-CREATE POLICY "Admin and production manage simulations"
-  ON sim_runs FOR ALL
+CREATE POLICY "Admin and production view simulations"
+  ON sim_runs FOR SELECT
+  USING ((SELECT role FROM profiles WHERE id = auth.uid()) IN ('admin', 'production'));
+
+CREATE POLICY "Admin and production create simulations"
+  ON sim_runs FOR INSERT
+  WITH CHECK ((SELECT role FROM profiles WHERE id = auth.uid()) IN ('admin', 'production'));
+
+CREATE POLICY "Admin and production update simulations"
+  ON sim_runs FOR UPDATE
+  USING ((SELECT role FROM profiles WHERE id = auth.uid()) IN ('admin', 'production'))
+  WITH CHECK ((SELECT role FROM profiles WHERE id = auth.uid()) IN ('admin', 'production'));
+
+CREATE POLICY "Admin and production delete simulations"
+  ON sim_runs FOR DELETE
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) IN ('admin', 'production'));
 
 CREATE POLICY "Admin and production view simulation events"
   ON sim_events FOR SELECT
   USING ((SELECT role FROM profiles WHERE id = auth.uid()) IN ('admin', 'production'));
+
+CREATE POLICY "Admin and production create simulation events"
+  ON sim_events FOR INSERT
+  WITH CHECK ((SELECT role FROM profiles WHERE id = auth.uid()) IN ('admin', 'production'));
 
 -- ============================================================================
 -- NOTES
