@@ -84,21 +84,22 @@ export default function QHSERecallSimulator() {
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <h1>🚨 QHSE Recall Simulator</h1>
-        <p>Simulation de rappel de produits - Mode DÉMO</p>
+        <h1 className={styles.headerTitle}>🚨 QHSE Recall Simulator</h1>
+        <p className={styles.headerSubtitle}>Simulation de rappel de produits - Mode DÉMO</p>
       </header>
 
       <div className={styles.mainLayout}>
         {/* COLONNE GAUCHE: Lancer un rappel */}
         <aside className={styles.leftPanel}>
           <div className={styles.card}>
-            <h2>Lancer un rappel</h2>
+            <h2 className={styles.cardTitle}>Lancer un rappel</h2>
 
             <div className={styles.formGroup}>
-              <label>Produit</label>
+              <label className={styles.formLabel}>Produit</label>
               <select
                 value={selectedProduct}
                 onChange={(e) => setSelectedProduct(e.target.value)}
+                className={styles.formSelect}
               >
                 {DEMO_PRODUCTS.map((p) => (
                   <option key={p.id} value={p.id}>
@@ -109,16 +110,17 @@ export default function QHSERecallSimulator() {
             </div>
 
             <div className={styles.formGroup}>
-              <label>DLC Date</label>
+              <label className={styles.formLabel}>DLC Date</label>
               <input
                 type="date"
                 value={selectedDlc}
                 onChange={(e) => setSelectedDlc(e.target.value)}
+                className={styles.formInput}
               />
             </div>
 
             <div className={styles.formGroup}>
-              <label>Sévérité</label>
+              <label className={styles.formLabel}>Sévérité</label>
               <div className={styles.severityButtons}>
                 {(["LOW", "MEDIUM", "HIGH"] as Severity[]).map((sev) => (
                   <button
@@ -167,42 +169,42 @@ export default function QHSERecallSimulator() {
 
               {/* Répartition par localisation */}
               <div className={styles.card}>
-                <h3>Localisation du stock</h3>
+                <h3 className={styles.cardSubtitle}>Localisation du stock</h3>
                 <div className={styles.locationGrid}>
                   <div className={styles.locationItem}>
-                    <span>📦 En stock</span>
-                    <strong>{recall.distribution_by_location.stock.toLocaleString()}</strong>
-                    <small>{((recall.distribution_by_location.stock / stats.totalAffectedUnits) * 100).toFixed(1)}%</small>
+                    <span className={styles.locationItemLabel}>📦 En stock</span>
+                    <strong className={styles.locationItemValue}>{recall.distribution_by_location.stock.toLocaleString()}</strong>
+                    <small className={styles.locationItemPercent}>{((recall.distribution_by_location.stock / stats.totalAffectedUnits) * 100).toFixed(1)}%</small>
                   </div>
                   <div className={styles.locationItem}>
-                    <span>📋 En préparation</span>
-                    <strong>{recall.distribution_by_location.preparation.toLocaleString()}</strong>
-                    <small>{((recall.distribution_by_location.preparation / stats.totalAffectedUnits) * 100).toFixed(1)}%</small>
+                    <span className={styles.locationItemLabel}>📋 En préparation</span>
+                    <strong className={styles.locationItemValue}>{recall.distribution_by_location.preparation.toLocaleString()}</strong>
+                    <small className={styles.locationItemPercent}>{((recall.distribution_by_location.preparation / stats.totalAffectedUnits) * 100).toFixed(1)}%</small>
                   </div>
                   <div className={styles.locationItem}>
-                    <span>🚚 En transit</span>
-                    <strong>{recall.distribution_by_location.in_transit.toLocaleString()}</strong>
-                    <small>{((recall.distribution_by_location.in_transit / stats.totalAffectedUnits) * 100).toFixed(1)}%</small>
+                    <span className={styles.locationItemLabel}>🚚 En transit</span>
+                    <strong className={styles.locationItemValue}>{recall.distribution_by_location.in_transit.toLocaleString()}</strong>
+                    <small className={styles.locationItemPercent}>{((recall.distribution_by_location.in_transit / stats.totalAffectedUnits) * 100).toFixed(1)}%</small>
                   </div>
                   <div className={styles.locationItem}>
-                    <span>📨 Livré au client</span>
-                    <strong>{recall.distribution_by_location.delivered.toLocaleString()}</strong>
-                    <small>{((recall.distribution_by_location.delivered / stats.totalAffectedUnits) * 100).toFixed(1)}%</small>
+                    <span className={styles.locationItemLabel}>📨 Livré au client</span>
+                    <strong className={styles.locationItemValue}>{recall.distribution_by_location.delivered.toLocaleString()}</strong>
+                    <small className={styles.locationItemPercent}>{((recall.distribution_by_location.delivered / stats.totalAffectedUnits) * 100).toFixed(1)}%</small>
                   </div>
                 </div>
               </div>
 
               {/* Répartition par centre */}
               <div className={styles.card}>
-                <h3>Répartition par centre</h3>
+                <h3 className={styles.cardSubtitle}>Répartition par centre</h3>
                 <div className={styles.centerGrid}>
                   {DISTRIBUTION_CENTERS.map((dc) => {
                     const qty = recall.distribution_by_center[dc.id] || 0;
                     return (
                       <div key={dc.id} className={styles.centerItem}>
-                        <strong>{dc.name}</strong>
-                        <div>{qty.toLocaleString()} unités</div>
-                        <small>{dc.city} ({dc.region})</small>
+                        <strong className={styles.centerItemName}>{dc.name}</strong>
+                        <div className={styles.centerItemValue}>{qty.toLocaleString()} unités</div>
+                        <small className={styles.centerItemCity}>{dc.city} ({dc.region})</small>
                       </div>
                     );
                   })}
@@ -211,7 +213,7 @@ export default function QHSERecallSimulator() {
 
               {/* Actions QHSE */}
               <div className={styles.card}>
-                <h3>Actions QHSE</h3>
+                <h3 className={styles.cardSubtitle}>Actions QHSE</h3>
                 <div className={styles.actionsGrid}>
                   <button
                     className={`${styles.actionBtn} ${recall.central_notified ? styles.disabled : ""}`}
@@ -248,15 +250,15 @@ export default function QHSERecallSimulator() {
 
               {/* Stats confirmations */}
               <div className={styles.card}>
-                <h3>État des confirmations</h3>
+                <h3 className={styles.cardSubtitle}>État des confirmations</h3>
                 <div className={styles.statsRow}>
-                  <div>
+                  <div className={styles.statsRowItem}>
                     <strong style={{ color: "#10b981" }}>✅ Confirmés:</strong> {stats.confirmedCustomers} clients
                   </div>
-                  <div>
+                  <div className={styles.statsRowItem}>
                     <strong style={{ color: "#f59e0b" }}>⏳ En attente:</strong> {stats.pendingCustomers} clients
                   </div>
-                  <div>
+                  <div className={styles.statsRowItem}>
                     <strong>📊 Taux:</strong> {((stats.confirmedCustomers / stats.totalAffectedCustomers) * 100).toFixed(0)}%
                   </div>
                 </div>
@@ -274,9 +276,9 @@ export default function QHSERecallSimulator() {
       {recall && (
         <div className={styles.clientsSection}>
           <div className={styles.clientsHeader}>
-            <h2>Clients impactés ({filteredImpacts.length})</h2>
+            <h2 className={styles.clientsHeaderTitle}>Clients impactés ({filteredImpacts.length})</h2>
             <div className={styles.controls}>
-              <label>
+              <label className={styles.controlsLabel}>
                 <input
                   type="checkbox"
                   checked={filterUnconfirmedOnly}
@@ -284,7 +286,7 @@ export default function QHSERecallSimulator() {
                 />
                 Non confirmés uniquement
               </label>
-              <select value={sortBy} onChange={(e) => setSortBy(e.target.value as any)}>
+              <select value={sortBy} onChange={(e) => setSortBy(e.target.value as any)} className={styles.controlsSelect}>
                 <option value="center">Trier par centre</option>
                 <option value="status">Trier par localisation</option>
                 <option value="name">Trier par client</option>
@@ -293,18 +295,18 @@ export default function QHSERecallSimulator() {
           </div>
 
           <div className={styles.clientsTable}>
-            <table>
-              <thead>
+            <table className={styles.clientsTableElement}>
+              <thead className={styles.clientsTableHead}>
                 <tr>
-                  <th>Client</th>
-                  <th>Email</th>
-                  <th>Téléphone</th>
-                  <th>Centre</th>
-                  <th>Localisation</th>
-                  <th>Unités</th>
-                  <th>Notifications</th>
-                  <th>Statut</th>
-                  <th>Action</th>
+                  <th className={styles.clientsTableHeadCell}>Client</th>
+                  <th className={styles.clientsTableHeadCell}>Email</th>
+                  <th className={styles.clientsTableHeadCell}>Téléphone</th>
+                  <th className={styles.clientsTableHeadCell}>Centre</th>
+                  <th className={styles.clientsTableHeadCell}>Localisation</th>
+                  <th className={styles.clientsTableHeadCell}>Unités</th>
+                  <th className={styles.clientsTableHeadCell}>Notifications</th>
+                  <th className={styles.clientsTableHeadCell}>Statut</th>
+                  <th className={styles.clientsTableHeadCell}>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -320,17 +322,17 @@ export default function QHSERecallSimulator() {
                   return (
                     <tr
                       key={impact.customer_id}
-                      className={`${!impact.client_confirmed ? styles.unconfirmed : styles.confirmed} ${impact.location === "delivered" ? styles.highRisk : ""}`}
+                      className={`${!impact.client_confirmed ? styles.clientsTableRow + " " + styles.unconfirmed : styles.clientsTableRow + " " + styles.confirmed} ${impact.location === "delivered" ? styles.highRisk : ""}`}
                     >
-                      <td>
-                        <strong>
+                      <td className={styles.clientsTableCell}>
+                        <strong className={styles.clientsTableCellStrong}>
                           {customer.prenom} {customer.nom}
                         </strong>
                       </td>
-                      <td>{customer.email}</td>
-                      <td>{customer.telephone}</td>
-                      <td>{center.name}</td>
-                      <td>
+                      <td className={styles.clientsTableCell}>{customer.email}</td>
+                      <td className={styles.clientsTableCell}>{customer.telephone}</td>
+                      <td className={styles.clientsTableCell}>{center.name}</td>
+                      <td className={styles.clientsTableCell}>
                         <span className={styles.badge}>
                           {impact.location === "stock" && "📦 Stock"}
                           {impact.location === "preparation" && "📋 Préparation"}
@@ -338,16 +340,14 @@ export default function QHSERecallSimulator() {
                           {impact.location === "delivered" && "📨 Livré"}
                         </span>
                       </td>
-                      <td>{impact.qty_units}</td>
-                      <td>{notificationStatus}</td>
-                      <td>
-                        <span
-                          className={`${styles.statusBadge} ${impact.client_confirmed ? styles.confirmed : styles.pending}`}
-                        >
+                      <td className={styles.clientsTableCell}>{impact.qty_units}</td>
+                      <td className={styles.clientsTableCell}>{notificationStatus}</td>
+                      <td className={styles.clientsTableCell}>
+                        <span className={`${styles.statusBadge} ${impact.client_confirmed ? styles.confirmed : styles.pending}`}>
                           {impact.client_confirmed ? "✅ Confirmé" : "⏳ En attente"}
                         </span>
                       </td>
-                      <td>
+                      <td className={styles.clientsTableCell}>
                         {!impact.client_confirmed && (
                           <button
                             className={styles.confirmBtn}

@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 
 export default function Page() {
-  // Rediriger vers login par défaut
-  redirect('/login');
+  // Rediriger directement vers la démo QHSE - pas d'authentification
+  redirect('/qhse');
 }

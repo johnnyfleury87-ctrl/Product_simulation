@@ -1,40 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { simulatedLogin } from '@/lib/authSimulation';
 
 /**
- * LOGIN API - MODE SIMULATION DÉMO
- * ================================
- * Pour production : réactiver getSupabaseServer() et signInWithPassword
- * 
- * MODE DÉMO : Utilise un système de login simulé sans Supabase Auth
- * Accepte n'importe quel email avec password: "demo" ou "demo123456"
+ * LOGIN API - DÉSACTIVÉE POUR MODE DÉMO
+ * =====================================
+ * L'authentification n'est pas nécessaire pour la démonstration.
+ * Accédez directement à /qhse
  */
 
 export async function POST(request: NextRequest) {
-  try {
-    const { email, password } = await request.json();
-
-    // Mode simulation
-    const result = await simulatedLogin(email, password);
-
-    if (!result.success) {
-      return NextResponse.json(
-        { success: false, error: result.error },
-        { status: 401 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        user: result.user,
-        token: `mock-token-${result.user!.id}`,
-      },
-    });
-  } catch (error) {
-    return NextResponse.json(
-      { success: false, error: 'Erreur serveur' },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json(
+    { success: false, error: 'L\'authentification a été désactivée. Accédez directement à /qhse' },
+    { status: 403 }
+  );
 }
+
