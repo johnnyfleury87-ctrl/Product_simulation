@@ -288,7 +288,7 @@ CREATE POLICY "Production and admin view inventory movements"
 
 CREATE POLICY "Production and admin manage inventory movements"
   ON inventory_movements FOR INSERT
-  USING ((SELECT role FROM profiles WHERE id = auth.uid()) IN ('admin', 'production'));
+  WITH CHECK ((SELECT role FROM profiles WHERE id = auth.uid()) IN ('admin', 'production'));
 
 CREATE POLICY "Production and admin view inventory balances"
   ON inventory_balances FOR SELECT
