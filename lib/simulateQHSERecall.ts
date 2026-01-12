@@ -5,6 +5,7 @@
  */
 
 import { DISTRIBUTION_CENTERS, DEMO_CUSTOMERS, getDistributionCenterById } from "@/data/demoCatalog";
+import { getMotifByCode, getUrgencyMultiplier } from "@/data/motifs";
 
 export type OperationType = "RETRAIT" | "RAPPEL";
 export type StockStatus = "DEPOT_STOCK" | "IN_TRANSIT" | "DELIVERED";
@@ -56,6 +57,11 @@ export interface QHSESimulation {
   scenario: ScenarioType;
   severity: Severity;
   
+  // Motif
+  motif_code: string;
+  motif_label: string;
+  motif_details?: string; // Si motif = "Autre"
+  
   // Produit & DLC
   product_id: string;
   product_name: string;
@@ -87,6 +93,9 @@ export interface QHSESimulationConfig {
   operation_type: OperationType;
   scenario: ScenarioType;
   severity: Severity;
+  motif_code: string;
+  motif_label: string;
+  motif_details?: string;
   product_id: string;
   product_name: string;
   dlc_reference: string;
@@ -145,6 +154,9 @@ export function generateQHSESimulation(config: QHSESimulationConfig): QHSESimula
     operation_type: config.operation_type,
     scenario: config.scenario,
     severity: config.severity,
+    motif_code: config.motif_code,
+    motif_label: config.motif_label,
+    motif_details: config.motif_details,
     product_id: config.product_id,
     product_name: config.product_name,
     dlc_reference: config.dlc_reference,

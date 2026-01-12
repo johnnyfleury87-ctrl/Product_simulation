@@ -1,18 +1,17 @@
 .container {
   min-height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #333;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
-    sans-serif;
+  background: linear-gradient(135deg, #f5f7fb 0%, #e8ecf1 100%);
+  color: #1a202c;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
 }
 
 .header {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
   color: white;
   padding: 2rem;
   text-align: center;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  border-bottom: 3px solid #10b981;
+  box-shadow: 0 8px 24px rgba(30, 64, 175, 0.2);
+  border-bottom: none;
 }
 
 .headerContent {
@@ -64,15 +63,16 @@
   background: white;
   border-radius: 12px;
   padding: 1.5rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  border-left: 4px solid #667eea;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid #1e40af;
 }
 
 .cardTitle {
   margin-top: 0;
   margin-bottom: 1rem;
-  color: #1f2937;
+  color: #1e40af;
   font-size: 1.2rem;
+  font-weight: 700;
 }
 
 .cardSubtitle {
@@ -99,17 +99,33 @@
 .formSelect {
   width: 100%;
   padding: 0.75rem;
-  border: 2px solid #e5e7eb;
+  border: 2px solid #cbd5e1;
   border-radius: 8px;
   font-size: 0.95rem;
   transition: all 0.2s;
+  background: white;
+  color: #1a202c;
+}
+
+.formTextarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: all 0.2s;
+  background: white;
+  color: #1a202c;
+  resize: vertical;
 }
 
 .formInput:focus,
-.formSelect:focus {
+.formSelect:focus,
+.formTextarea:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #1e40af;
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
 }
 
 .severityButtons {
@@ -153,7 +169,7 @@
 .launchBtn {
   width: 100%;
   padding: 1rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
   color: white;
   border: none;
   border-radius: 8px;
@@ -161,13 +177,13 @@
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.25);
   margin-top: 1rem;
 }
 
 .launchBtn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 6px 16px rgba(30, 64, 175, 0.35);
 }
 
 .launchBtn:active {
@@ -186,17 +202,17 @@
   border-radius: 12px;
   padding: 1.5rem;
   text-align: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  border-left: 4px solid #667eea;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  border-left: 4px solid #1e40af;
 }
 
 .kpiCard.primary {
-  border-left-color: #667eea;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+  border-left-color: #1e40af;
+  background: linear-gradient(135deg, rgba(30, 64, 175, 0.04) 0%, rgba(30, 64, 175, 0.02) 100%);
 }
 
 .kpiCard.secondary {
-  border-left-color: #06b6d4;
+  border-left-color: #64748b;
 }
 
 .kpiCard.success {
@@ -208,16 +224,20 @@
   animation: pulse-warning 2s infinite;
 }
 
+.kpiCard.info {
+  border-left-color: #1e40af;
+}
+
 .kpiValue {
   font-size: 2.5rem;
   font-weight: 800;
-  color: #667eea;
+  color: #1e40af;
   margin-bottom: 0.5rem;
 }
 
 .kpiLabel {
   font-size: 0.9rem;
-  color: #6b7280;
+  color: #64748b;
   font-weight: 500;
 }
 
@@ -598,11 +618,11 @@
 
 .dlcWindowDisplay {
   font-size: 0.85rem;
-  color: #667eea;
+  color: #1e40af;
   font-weight: 600;
   margin-top: 0.5rem;
   padding: 0.5rem 0.75rem;
-  background: #f0f4ff;
+  background: #eff6ff;
   border-radius: 6px;
   text-align: center;
 }
@@ -625,13 +645,13 @@
 }
 
 .buttonSmall:hover {
-  border-color: #667eea;
+  border-color: #1e40af;
 }
 
 .buttonSmall.active {
   color: white;
   border-color: transparent;
-  background: #667eea;
+  background: #1e40af;
 }
 
 .buttonSmall.severity-LOW.active {
@@ -710,7 +730,7 @@
 .infoBadge {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #667eea;
+  color: #1e40af;
 }
 
 .statusGrid {
@@ -729,8 +749,8 @@
 }
 
 .statusCard:not(.disabled):hover {
-  border-color: #667eea;
-  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.15);
+  border-color: #1e40af;
+  box-shadow: 0 2px 10px rgba(30, 64, 175, 0.15);
 }
 
 .statusCard.disabled {
@@ -768,7 +788,7 @@
 .statusCardBtn {
   width: 100%;
   padding: 0.5rem;
-  background: #667eea;
+  background: #1e40af;
   color: white;
   border: none;
   border-radius: 6px;
@@ -779,7 +799,7 @@
 }
 
 .statusCardBtn:hover:not(:disabled) {
-  background: #5568d3;
+  background: #1e3a8a;
   transform: translateY(-1px);
 }
 
@@ -804,7 +824,7 @@
 .centerCardCode {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #667eea;
+  color: #1e40af;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   margin-bottom: 0.25rem;
@@ -878,11 +898,11 @@
   background: white;
   margin: 0 2rem 2rem 2rem;
   border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   max-width: 1600px;
   margin-left: auto;
   margin-right: auto;
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #1e40af;
   overflow: hidden;
 }
 
@@ -921,8 +941,8 @@
 
 .filterSelect:focus {
   outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  border-color: #1e40af;
+  box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
 }
 
 .tableContainer {
@@ -1085,4 +1105,15 @@
     padding: 0.5rem;
     font-size: 0.8rem;
   }
+}
+
+.detailsText {
+  font-size: 0.9rem;
+  color: #1a202c;
+  line-height: 1.5;
+  font-style: italic;
+  padding: 0.5rem;
+  background: #f8fafc;
+  border-left: 3px solid #1e40af;
+  border-radius: 4px;
 }

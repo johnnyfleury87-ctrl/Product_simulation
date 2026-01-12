@@ -22,6 +22,7 @@ import {
   getQHSEImpactsByStatus,
 } from "@/lib/useQHSERealtimeSimulation";
 import { DEMO_PRODUCTS, DISTRIBUTION_CENTERS } from "@/data/demoCatalog";
+import { getMotifsByType } from "@/data/motifs";
 import styles from "./page.module.css";
 
 interface FilterState {
@@ -40,6 +41,8 @@ export default function QHSERecallSimulator() {
   const [selectedSeverity, setSelectedSeverity] = useState<Severity>("MEDIUM");
   const [selectedOperationType, setSelectedOperationType] = useState<OperationType>("RAPPEL");
   const [selectedScenario, setSelectedScenario] = useState<ScenarioType>("NORMAL");
+  const [selectedMotif, setSelectedMotif] = useState<string>("MICRO_RISK");
+  const [motifDetails, setMotifDetails] = useState<string>("");
   const [realtimeEnabled, setRealtimeEnabled] = useState(false);
   const [realtimePaused, setRealtimePaused] = useState(false);
   const [filters, setFilters] = useState<FilterState>({
@@ -66,10 +69,16 @@ export default function QHSERecallSimulator() {
     const product = DEMO_PRODUCTS.find((p) => p.id === selectedProduct);
     if (!product) return;
 
+    const motif = getMotifsByType(selectedOperationType).find((m) => m.code === selectedMotif);
+    if (!motif) return;
+
     const config: QHSESimulationConfig = {
       operation_type: selectedOperationType,
       scenario: selectedScenario,
       severity: selectedSeverity,
+      motif_code: motif.code,
+      motif_label: motif.label,
+      motif_details: motifDetails || undefined,
       product_id: product.id,
       product_name: product.name,
       dlc_reference: selectedDlcRef,
@@ -202,12 +211,40 @@ export default function QHSERecallSimulator() {
               <label className={styles.formLabel}>Type d'opération</label>
               <div className={styles.buttonGroup}>
                 {(["RETRAIT", "RAPPEL"] as OperationType[]).map((type) => (
-                  <button key={type} className={`${styles.buttonSmall} ${selectedOperationType === type ? styles.active : ""}`} onClick={() => setSelectedOperationType(type)}>
+                  <button key={type} className={`${styles.buttonSmall} ${selectedOperationType === type ? styles.active : ""}`} onClick={() => {
+                    setSelectedOperationType(type);
+                    // Réinitialiser motif au premier disponible du type
+                    const firstMotif = getMotifsByType(type)[0];
+                    if (firstMotif) setSelectedMotif(firstMotif.code);
+                    setMotifDetails("");
+                  }}>
                     {type}
                   </button>
                 ))}
               </div>
             </div>
+
+            <div className={styles.formGroup}>
+              <label className={styles.formLabel}>Motif</label>
+              <select value={selectedMotif} onChange={(e) => setSelectedMotif(e.target.value)} className={styles.formSelect}>
+                {getMotifsByType(selectedOperationType).map((motif) => (
+                  <option key={motif.code} value={motif.code}>{motif.label}</option>
+                ))}
+              </select>
+            </div>
+
+            {(selectedMotif === "OTHER" || selectedMotif === "OTHER_RETRAIT") && (
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Détails motif</label>
+                <textarea
+                  value={motifDetails}
+                  onChange={(e) => setMotifDetails(e.target.value)}
+                  className={styles.formTextarea}
+                  placeholder="Décrivez le motif spécifique..."
+                  rows={3}
+                />
+              </div>
+            )}
 
             {selectedOperationType === "RAPPEL" && (
               <div className={styles.formGroup}>
@@ -250,6 +287,10 @@ export default function QHSERecallSimulator() {
                 <div className={styles.cardTitle}>Opération</div>
                 <div className={styles.infoGrid}>
                   <div className={styles.infoItem}><span className={styles.infoLabel}>Type:</span><span className={styles.infoBadge}>{simulation.operation_type === "RETRAIT" ? "🔵 RETRAIT" : "🟠 RAPPEL"}</span></div>
+                  <div className={styles.infoItem}><span className={styles.infoLabel}>Motif:</span><span>{simulation.motif_label}</span></div>
+                  {simulation.motif_details && (
+                    <div className={styles.infoItem}><span className={styles.infoLabel}>Détails:</span><span className={styles.detailsText}>{simulation.motif_details}</span></div>
+                  )}
                   <div className={styles.infoItem}><span className={styles.infoLabel}>Produit:</span><span>{simulation.product_name}</span></div>
                   <div className={styles.infoItem}><span className={styles.infoLabel}>DLC:</span><span>{simulation.dlc_reference}</span></div>
                   <div className={styles.infoItem}><span className={styles.infoLabel}>Fenêtre:</span><span>{simulation.dlc_min} à {simulation.dlc_max}</span></div>
