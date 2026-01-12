@@ -7,6 +7,8 @@ import { NextRequest, NextResponse } from 'next/server';
  * Récupérer les logs d'événements (tous les types)
  * Query params: type?, limit?, days?
  */
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const supabaseServer = getSupabaseServer();
