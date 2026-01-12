@@ -15,16 +15,14 @@ export default function ProductionPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const userStr = localStorage.getItem('user');
+    // Mode simulation : accepter simulated_user ET user
+    // Pas de vérification de rôle en mode démo
+    const userStr = localStorage.getItem('simulated_user') || localStorage.getItem('user');
     if (!userStr) {
       router.push('/login');
       return;
     }
     const userData = JSON.parse(userStr) as Profile;
-    if (userData.role !== 'production' && userData.role !== 'admin') {
-      router.push('/dashboard');
-      return;
-    }
     setUser(userData);
   }, [router]);
 

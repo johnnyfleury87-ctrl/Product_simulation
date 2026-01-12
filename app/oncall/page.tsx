@@ -9,7 +9,8 @@ export default function OncallPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const userStr = localStorage.getItem('user');
+    // Mode simulation : accepter simulated_user ET user
+    const userStr = localStorage.getItem('simulated_user') || localStorage.getItem('user');
     if (!userStr) {
       router.push('/login');
       return;

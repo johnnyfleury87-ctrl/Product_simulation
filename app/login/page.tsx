@@ -31,20 +31,12 @@ export default function LoginPage() {
       }
 
       // Sauvegarder le token et l'utilisateur dans localStorage
-      localStorage.setItem('token', result.data.token);
-      localStorage.setItem('user', JSON.stringify(result.data.user));
+      localStorage.setItem('auth_token', result.data.token);
+      localStorage.setItem('simulated_user', JSON.stringify(result.data.user));
 
-      // Rediriger selon le rôle
-      const role = result.data.user.role;
-      const routes: Record<string, string> = {
-        admin: '/dashboard',
-        production: '/production',
-        client: '/client',
-        fournisseur: '/fournisseur',
-        oncall: '/oncall',
-      };
-
-      router.push(routes[role] || '/dashboard');
+      // Redirection directe vers dashboard (pas de vérification de rôle)
+      // En mode simulation, tous les rôles accèdent au dashboard
+      router.push('/dashboard');
     } catch (err) {
       setError('Erreur serveur');
       setLoading(false);
@@ -90,15 +82,27 @@ export default function LoginPage() {
         </form>
 
         <div style={styles.demoAccounts}>
-          <h3>Comptes démo disponibles:</h3>
+          <h3>🎭 MODE DÉMO - SIMULATION</h3>
+          <p style={{ fontSize: '14px', color: '#666', marginBottom: '15px' }}>
+            Utilise n'importe quel email avec le mot de passe: <strong>demo</strong> ou <strong>demo123456</strong>
+          </p>
+          <p style={{ fontSize: '13px', color: '#999', marginBottom: '15px' }}>
+            Exemples:
+          </p>
           <ul style={styles.accountList}>
-            <li>demo.admin@example.com (Admin)</li>
-            <li>demo.production@example.com (Production)</li>
-            <li>demo.client@example.com (Client)</li>
-            <li>demo.fournisseur@example.com (Fournisseur)</li>
-            <li>demo.oncall@example.com (On-call)</li>
+            <li>demo.admin@example.com</li>
+            <li>demo.production@example.com</li>
+            <li>demo.client@example.com</li>
+            <li>demo.fournisseur@example.com</li>
+            <li>demo.oncall@example.com</li>
+            <li>test@example.com (ou n'importe quel autre email)</li>
           </ul>
-          <p style={styles.passwordNote}>Mot de passe pour tous: <strong>demo123456</strong></p>
+          <p style={styles.passwordNote}>
+            ✓ Mot de passe: <strong>demo</strong> ou <strong>demo123456</strong>
+          </p>
+          <p style={{ fontSize: '12px', color: '#f97316', fontStyle: 'italic', marginTop: '10px' }}>
+            En simulation, tous les rôles accèdent à toutes les vues.
+          </p>
         </div>
       </div>
     </div>

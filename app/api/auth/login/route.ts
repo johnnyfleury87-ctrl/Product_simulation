@@ -1,51 +1,34 @@
-import { getSupabaseServer } from '@/lib/supabaseServer';
 import { NextRequest, NextResponse } from 'next/server';
+import { simulatedLogin } from '@/lib/authSimulation';
+
+/**
+ * LOGIN API - MODE SIMULATION DÉMO
+ * ================================
+ * Pour production : réactiver getSupabaseServer() et signInWithPassword
+ * 
+ * MODE DÉMO : Utilise un système de login simulé sans Supabase Auth
+ * Accepte n'importe quel email avec password: "demo" ou "demo123456"
+ */
 
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
-    const supabaseServer = getSupabaseServer();
 
-    // Vérifier les champs
-    if (!email || !password) {
+    // Mode simulation
+    const result = await simulatedLogin(email, password);
+
+    if (!result.success) {
       return NextResponse.json(
-        { success: false, error: 'Email et mot de passe requis' },
-        { status: 400 }
-      );
-    }
-
-    // Authentifier avec Supabase
-    const { data, error } = await supabaseServer.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      return NextResponse.json(
-        { success: false, error: error.message },
+        { success: false, error: result.error },
         { status: 401 }
-      );
-    }
-
-    // Récupérer le profil
-    const { data: profile, error: profileError } = await supabaseServer
-      .from('profiles')
-      .select('*')
-      .eq('id', data.user.id)
-      .single();
-
-    if (profileError) {
-      return NextResponse.json(
-        { success: false, error: 'Profil non trouvé' },
-        { status: 404 }
       );
     }
 
     return NextResponse.json({
       success: true,
       data: {
-        user: profile,
-        token: data.session?.access_token,
+        user: result.user,
+        token: `mock-token-${result.user!.id}`,
       },
     });
   } catch (error) {
